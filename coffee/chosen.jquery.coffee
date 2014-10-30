@@ -273,8 +273,10 @@ class Chosen extends AbstractChosen
       @search_field.val(@default_text)
       @search_field.addClass "default"
     else
-      @search_field.val("")
-      @search_field.removeClass "default"
+      if @isAjax is false
+        @search_field.val("")
+        @search_field.removeClass "default"
+    return @
 
   search_results_mouseup: (evt) ->
     target = if $(evt.target).hasClass "active-result" then $(evt.target) else $(evt.target).parents(".active-result").first()
