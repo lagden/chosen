@@ -16,6 +16,7 @@ class AbstractChosen
   set_default_values: ->
     @click_test_action = (evt) => this.test_active_click(evt)
     @activate_action = (evt) => this.activate_field(evt)
+    @isAjax = @options.isAjax || false;
     @active_field = false
     @mouse_on_container = false
     @results_showing = false
@@ -155,21 +156,21 @@ class AbstractChosen
           results_group = @results_data[option.group_array_index]
           results += 1 if results_group.active_options is 0 and results_group.search_match
           results_group.active_options += 1
-                
+
         unless option.group and not @group_search
 
           option.search_text = if option.group then option.label else option.text
           option.search_match = this.search_string_match(option.search_text, regex)
           results += 1 if option.search_match and not option.group
 
-          if option.search_match
+          if option.search_match and @isAjax is false
             if searchText.length
               startpos = option.search_text.search zregex
               text = option.search_text.substr(0, startpos + searchText.length) + '</em>' + option.search_text.substr(startpos + searchText.length)
               option.search_text = text.substr(0, startpos) + '<em>' + text.substr(startpos)
 
             results_group.group_match = true if results_group?
-          
+
           else if option.group_array_index? and @results_data[option.group_array_index].search_match
             option.search_match = true
 
@@ -186,7 +187,18 @@ class AbstractChosen
     regex_anchor = if @search_contains then "" else "^"
     new RegExp(regex_anchor + escaped_search_string, 'i')
 
+  escapeRegex: (value) ->
+    return value.replace /[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&'
+
   search_string_match: (search_string, regex) ->
+    arrayOfTerms = @search_field[0].value.split ' '
+    term = $.map(arrayOfTerms, (tm) =>
+        return @escapeRegex tm
+    ).join '|';
+    matcher = new RegExp "\\b#{term}", "i"
+    return matcher.test search_string
+
+  search_string_match_old: (search_string, regex) ->
     if regex.test search_string
       return true
     else if @enable_split_word_search and (search_string.indexOf(" ") >= 0 or search_string.indexOf("[") == 0)
@@ -203,7 +215,7 @@ class AbstractChosen
     @selected_option_count = 0
     for option in @form_field.options
       @selected_option_count += 1 if option.selected
-    
+
     return @selected_option_count
 
   choices_click: (evt) ->
@@ -261,15 +273,15 @@ class AbstractChosen
     tmp.appendChild(element)
     tmp.innerHTML
 
-  # class methods and variables ============================================================ 
+  # class methods and variables ============================================================
 
   @browser_is_supported: ->
-    if window.navigator.appName == "Microsoft Internet Explorer"
-      return document.documentMode >= 8
-    if /iP(od|hone)/i.test(window.navigator.userAgent)
-      return false
-    if /Android/i.test(window.navigator.userAgent)
-      return false if /Mobile/i.test(window.navigator.userAgent)
+    # if window.navigator.appName == "Microsoft Internet Explorer"
+    #   return document.documentMode >= 8
+    # if /iP(od|hone)/i.test(window.navigator.userAgent)
+    #   return false
+    # if /Android/i.test(window.navigator.userAgent)
+    #   return false if /Mobile/i.test(window.navigator.userAgent)
     return true
 
   @default_multiple_text: "Select Some Options"
