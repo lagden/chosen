@@ -160,7 +160,7 @@ class AbstractChosen
         unless option.group and not @group_search
 
           option.search_text = if option.group then option.label else option.text
-          option.search_match = this.search_string_match(option.search_text, regex)
+          option.search_match = @search_string_match(option.search_text, regex)
           results += 1 if option.search_match and not option.group
 
           if option.search_match and @isAjax is false
@@ -209,11 +209,11 @@ class AbstractChosen
           if regex.test part
             return true
 
-    search_string_match: (search_string, regex) ->
-      if @isAjax
-        return search_string_match_ajax search_string, regex
-      else
-        return search_string_match_general search_string, regex
+  search_string_match: (search_string, regex) ->
+    if @isAjax
+      return search_string_match_ajax search_string, regex
+    else
+      return search_string_match_general search_string, regex
 
   choices_count: ->
     return @selected_option_count if @selected_option_count?
