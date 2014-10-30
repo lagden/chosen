@@ -8,3 +8,5 @@ chosen.zip
 .sass-cache
 .ruby-version
 .rbenv-gemsets
+
+!public/chosen.jquery.js
