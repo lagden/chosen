@@ -190,7 +190,7 @@ class AbstractChosen
   escapeRegex: (value) ->
     return value.replace /[\-\[\]{}()*+?.,\\\^$|#\s]/g, '\\$&'
 
-  search_string_match: (search_string, regex) ->
+  search_string_match_ajax: (search_string, regex) ->
     arrayOfTerms = @search_field[0].value.split ' '
     term = $.map(arrayOfTerms, (tm) =>
         return @escapeRegex tm
@@ -198,7 +198,7 @@ class AbstractChosen
     matcher = new RegExp "\\b#{term}", "i"
     return matcher.test search_string
 
-  search_string_match_old: (search_string, regex) ->
+  search_string_match_general: (search_string, regex) ->
     if regex.test search_string
       return true
     else if @enable_split_word_search and (search_string.indexOf(" ") >= 0 or search_string.indexOf("[") == 0)
@@ -208,6 +208,12 @@ class AbstractChosen
         for part in parts
           if regex.test part
             return true
+
+    search_string_match: (search_string, regex) ->
+      if @isAjax
+        return search_string_match_ajax search_string, regex
+      else
+        return search_string_match_general search_string, regex
 
   choices_count: ->
     return @selected_option_count if @selected_option_count?
