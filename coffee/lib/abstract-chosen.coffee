@@ -211,9 +211,9 @@ class AbstractChosen
 
   search_string_match: (search_string, regex) ->
     if @isAjax
-      return search_string_match_ajax search_string, regex
+      return @search_string_match_ajax search_string, regex
     else
-      return search_string_match_general search_string, regex
+      return @search_string_match_general search_string, regex
 
   choices_count: ->
     return @selected_option_count if @selected_option_count?
